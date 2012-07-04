@@ -1,4 +1,0 @@
-Add SWT artifacts to local repo:
-
-mvn install:install-file -DgroupId=org.eclipse -DartifactId=swt -Dversion=3.7.2-cocoa-macosx-x86_64 -Dfile=swt.jar -Dpackaging=jar -DlocalRepositoryPath=repo
-mvn install:install-file -DgroupId=org.eclipse -DartifactId=swt -Dversion=3.7.2-cocoa-macosx-x86_64 -Dfile=src.zip -Dpackaging=jar -Dclassifier=sources -DlocalRepositoryPath=repo
