@@ -53,9 +53,9 @@ aspect ratio of cells in the layout close to one.
 When rendering a treemap, labels can be placed into cells. The `TreemapLabelProvider` provides
 the API to specify those:
 
-	String getText(Object node, Object value); // label to place inside a cell
-	String getTooltipText(Object node, Object value); // optional tooltip label
-	int getLabelLevels(Object root); // depth to which labels should be shown
+	String getText(Object element, Object value); // label to place inside a cell
+	String getTooltipText(Object element, Object value); // optional tooltip label
+	int getLabelLevels(Object rootElement); // depth to which labels should be shown
 
 ### TreemapColorProvider Interface
 
