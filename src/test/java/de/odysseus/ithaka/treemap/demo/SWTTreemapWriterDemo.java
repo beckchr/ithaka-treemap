@@ -15,20 +15,18 @@
  */
 package de.odysseus.ithaka.treemap.demo;
 
-import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 
 import de.odysseus.ithaka.treemap.SquarifiedTreemapBuilder;
 import de.odysseus.ithaka.treemap.Treemap;
@@ -69,20 +67,25 @@ public class SWTTreemapWriterDemo {
 		writer.write(layout, output);
 		output.close();
 
-		final BufferedImage image = ImageIO.read(new ByteArrayInputStream(output.toByteArray()));
-		Canvas canvas = new Canvas() {
-			private static final long serialVersionUID = 1L;
-			@Override
-			public void paint(Graphics g) {
-				g.drawImage(image, 0, 0, this);
-			}
-		};
-		canvas.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
-		JFrame frame = new JFrame("SWT Treemap Writer Demo");
-		frame.add(canvas);
-        frame.pack();
-        frame.setResizable(false);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Display display = Display.getDefault();
+        Image image = new Image(display, new ByteArrayInputStream(output.toByteArray()));
+        Shell shell = new Shell(display);
+        shell.setText("SWT Treemap Writer Demo");
+        shell.setLayout(new FillLayout());
+        Label label = new Label(shell, SWT.NONE);
+        label.setImage(image);
+
+        shell.pack();
+        shell.open();
+
+        while (!shell.isDisposed()) {
+            if (!display.readAndDispatch()) {
+                display.sleep();
+            }
+        }
+        image.dispose();
+        display.dispose();
+        
+        System.exit(0);
 	}
 }
