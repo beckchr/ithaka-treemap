@@ -15,12 +15,18 @@
  */
 package de.odysseus.ithaka.treemap.demo;
 
+import java.awt.Canvas;
 import java.awt.Color;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Arrays;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 
 import org.eclipse.swt.SWT;
 
@@ -59,10 +65,24 @@ public class SWTTreemapWriterDemo {
 		TreemapRenderer renderer = new TreemapRenderer(new SampleLabelProvider(), new SampleColorProvider());
 
 		TreemapWriter writer = new SWTTreemapWriter(renderer, SWT.IMAGE_PNG, null);
-		OutputStream output = new FileOutputStream(new File(System.getProperty("user.home"), "treemap-swt.png"));
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		writer.write(layout, output);
 		output.close();
 
-		System.exit(0);
+		final BufferedImage image = ImageIO.read(new ByteArrayInputStream(output.toByteArray()));
+		Canvas canvas = new Canvas() {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public void paint(Graphics g) {
+				g.drawImage(image, 0, 0, this);
+			}
+		};
+		canvas.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
+		JFrame frame = new JFrame("SWT Treemap Writer Demo");
+		frame.add(canvas);
+        frame.pack();
+        frame.setResizable(false);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }
