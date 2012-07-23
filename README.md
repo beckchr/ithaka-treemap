@@ -43,7 +43,7 @@ A `TreemapBulder` is used to create a treemap (i.e. the layout).
 
 	Treemap build(TreemapContentProvider content, Object input, int width, int height);
 
-### SquarifiedTreemap Class
+### SquarifiedTreemapBuilder Class
 
 The `SquarifiedTreemapBuilder` class implements `TreemapBulder`, taking care about keeping the
 aspect ratio of cells in the layout close to one.
