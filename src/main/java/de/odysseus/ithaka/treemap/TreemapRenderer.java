@@ -21,6 +21,12 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 public class TreemapRenderer {
+	public static enum AttachLabelMode {
+		AnyVisible, // any frames and leafs
+		VisibleForked, // subsequent frames and highest visible descendants of forked cell
+		TopLevelsOnly; // root elements, frames and first non-frame child
+	}
+
 	public static enum TruncateLabelMode {
 		LeadingDots,
 		TrailingDots;
@@ -33,19 +39,24 @@ public class TreemapRenderer {
 	private final int labelSpaceLR;
 	private final int labelSpaceTB;
 
+	private int labelLevels = Integer.MAX_VALUE;
+	private AttachLabelMode attachLabelMode = AttachLabelMode.VisibleForked;
+	private TruncateLabelMode truncateLabelMode = TruncateLabelMode.TrailingDots;
+
 	public TreemapRenderer(TreemapLabelProvider labelProvider, TreemapColorProvider colorProvider) {
 		this(labelProvider, colorProvider, 4, 2);
 	}
 
-	public TreemapRenderer(TreemapLabelProvider labelProvider, TreemapColorProvider colorProvider, int labelSpaceLR, int labelSpaceTB) {
+	public TreemapRenderer(
+			TreemapLabelProvider labelProvider,
+			TreemapColorProvider colorProvider,
+			int labelSpaceLR,
+			int labelSpaceTB) {
 		this.labelProvider = labelProvider;
 		this.colorProvider = colorProvider;
 		this.labelSpaceLR = labelSpaceLR;
 		this.labelSpaceTB = labelSpaceTB;
 	}
-
-	private TruncateLabelMode truncateLabelMode = TruncateLabelMode.TrailingDots;
-	private boolean toplevelLabelsOnly = false; // TODO ?
 
 	/**
 	 * Render all cells and labels.
@@ -120,34 +131,45 @@ public class TreemapRenderer {
 	public void renderLabels(TreemapGraphics graphics, Treemap layout) {
 		Object[] elements = layout.getElements();
 		for (Object node : elements) {
-			renderLabels(graphics, layout, node, toplevelLabelsOnly || elements.length > 1, labelProvider.getLabelLevels(node));
+			renderLabels(graphics, layout, node, elements.length > 1, labelLevels);
 		}
 	}
 
 	private void renderLabels(TreemapGraphics graphics, Treemap layout, Object item, boolean forked, int levels) {
+		if (levels == 0) {
+			return;
+		}
 		TreemapCell cell = layout.getCell(item);
 		if (cell == null) {
 			return;
 		}
-		if (cell.getFramed() == null && !cell.isLeaf() && !forked) {
-			if (levels > 0) {
-				Object[] children = cell.getChildren();
-				forked = forked || children.length > 1;
-				for (Object child : children) {
-					renderLabels(graphics, layout, child, forked, levels);
-				}
+		boolean attachLabel;
+		switch (attachLabelMode) {
+		case AnyVisible:
+			attachLabel = cell.isLeaf() || cell.getFramed() != null;
+			break;
+		case VisibleForked:
+			attachLabel = cell.isLeaf() || cell.getFramed() != null || forked;
+			break;
+		default:
+			attachLabel = true;
+		}
+		if (attachLabel) {
+			if (renderLabel(graphics, cell, item)) {
+				renderChildrenLabels(graphics, layout, cell.getChildren(), levels - 1);
 			}
-		} else {
-			if (renderLabel(graphics, cell, item) && cell.getFramed() != null && levels > 1) {
-				Object[] children = cell.getChildren();
-				forked = forked || children.length > 1;
-				for (Object child : children) {
-					renderLabels(graphics, layout, child, forked, levels - 1);
-				}
-			}
+		} else if (attachLabelMode != AttachLabelMode.TopLevelsOnly) {
+			renderChildrenLabels(graphics, layout, cell.getChildren(), levels - 1);
 		}
 	}
-	
+
+	private void renderChildrenLabels(TreemapGraphics graphics, Treemap layout, Object[] children, int levels) {
+		boolean forked = children.length > 1;
+		for (Object child : children) {
+			renderLabels(graphics, layout, child, forked, levels);
+		}
+	}
+
 	private String truncateLabel(String label, int availableWidth, int requiredWidth, int minCharacters) {
 		int fittingCharacters = (label.length() * availableWidth) / requiredWidth - DOTS.length();
 		if (fittingCharacters >= minCharacters) { // at least three character --> render label
@@ -221,11 +243,19 @@ public class TreemapRenderer {
 		this.truncateLabelMode = truncateLabelMode;
 	}
 	
-	public boolean isToplevelLabelsOnly() {
-		return toplevelLabelsOnly;
+	public AttachLabelMode getAttachLabelMode() {
+		return attachLabelMode;
 	}
 	
-	public void setToplevelLabelsOnly(boolean toplevelLabelsOnly) {
-		this.toplevelLabelsOnly = toplevelLabelsOnly;
+	public void setAttachLabelMode(AttachLabelMode attachLabelMode) {
+		this.attachLabelMode = attachLabelMode;
+	}
+	
+	public int getLabelLevels() {
+		return labelLevels;
+	}
+	
+	public void setLabelLevels(int labelLevels) {
+		this.labelLevels = labelLevels;
 	}
 }

@@ -18,5 +18,4 @@ package de.odysseus.ithaka.treemap;
 public interface TreemapLabelProvider {
 	public String getText(Object element, Object value);
 	public String getTooltipText(Object element, Object value);
-	public int getLabelLevels(Object rootElement);
 }

@@ -55,7 +55,6 @@ the API to specify those:
 
 	String getText(Object element, Object value); // label to place inside a cell
 	String getTooltipText(Object element, Object value); // optional tooltip label
-	int getLabelLevels(Object rootElement); // depth to which labels should be shown
 
 ### TreemapColorProvider Interface
 

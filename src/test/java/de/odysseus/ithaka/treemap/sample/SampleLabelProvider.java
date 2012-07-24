@@ -27,9 +27,4 @@ public class SampleLabelProvider implements TreemapLabelProvider {
 	public String getTooltipText(Object node, Object value) {
 		return null;
 	}
-
-	@Override
-	public int getLabelLevels(Object root) {
-		return Integer.MAX_VALUE;
-	}
 }
