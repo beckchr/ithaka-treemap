@@ -155,7 +155,7 @@ public class TreemapRenderer {
 			attachLabel = true;
 		}
 		if (attachLabel) {
-			if (renderLabel(graphics, cell, item)) {
+			if (renderLabel(graphics, cell, item) && cell.getFramed() != null) {
 				renderChildrenLabels(graphics, layout, cell.getChildren(), levels - 1);
 			}
 		} else if (attachLabelMode != AttachLabelMode.TopLevelsOnly) {
