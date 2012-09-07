@@ -101,10 +101,10 @@ as well as dependency
 	<dependency>
 		<groupId>de.odysseus.ithaka</groupId>
 		<artifactId>ithaka-treemap</artifactId>
-		<version>0.9.5</version>
+		<version>1.0</version>
 	</dependency>
 
-or manually grab latest JARs [here](http://beckchr.github.com/ithaka-maven/mvnrepo/de/odysseus/ithaka/ithaka-treemap/0.9.5). 
+or manually grab latest JARs [here](http://beckchr.github.com/ithaka-maven/mvnrepo/de/odysseus/ithaka/ithaka-treemap/1.0). 
 
 ## License
 
