@@ -44,15 +44,15 @@ public class SWTTreemapWriter implements TreemapWriter {
 	}
 
 	@Override
-	public void write(Treemap layout, OutputStream output) throws IOException, SWTException {
-		Image image = new Image(Display.getDefault(), layout.getWidth(), layout.getHeight());
+	public void write(Treemap treemap, OutputStream output) throws IOException, SWTException {
+		Image image = new Image(Display.getDefault(), treemap.getWidth(), treemap.getHeight());
 		GC gc = new GC(image);
 		gc.fillRectangle(image.getBounds());
 		gc.setFont(font);
 		gc.setAntialias(SWT.OFF);
 		gc.setTextAntialias(SWT.ON);
 		TreemapGraphics graphics = new SWTTreemapGraphics(gc);
-		renderer.render(graphics, layout);
+		renderer.render(graphics, treemap);
 		graphics.dispose();
 		gc.dispose();
 

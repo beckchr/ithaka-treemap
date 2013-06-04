@@ -40,14 +40,14 @@ public class AWTTreemapWriter implements TreemapWriter {
 	}
 
 	@Override
-	public void write(Treemap layout, OutputStream output) throws IOException {
+	public void write(Treemap treemap, OutputStream output) throws IOException {
 		// TYPE_INT_ARGB specifies the image format: 8-bit RGBA packed into integer pixels
-		BufferedImage image = new BufferedImage(layout.getWidth(), layout.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage image = new BufferedImage(treemap.getWidth(), treemap.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics2D = image.createGraphics();
 		graphics2D.setFont(font);
 		graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		AWTTreemapGraphics graphics = new AWTTreemapGraphics(graphics2D);
-		renderer.render(graphics, layout);
+		renderer.render(graphics, treemap);
 		graphics.dispose();
 		ImageIO.write(image, format, output);
 	}

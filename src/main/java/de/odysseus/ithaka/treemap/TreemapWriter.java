@@ -19,5 +19,5 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public interface TreemapWriter {
-	public void write(Treemap layout, OutputStream output) throws IOException;
+	public void write(Treemap treemap, OutputStream output) throws IOException;
 }

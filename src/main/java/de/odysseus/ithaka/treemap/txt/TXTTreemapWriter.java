@@ -43,9 +43,9 @@ public class TXTTreemapWriter implements TreemapWriter {
 	}
 
 	@Override
-	public void write(Treemap layout, OutputStream output) throws IOException {
-		TXTTreemapGraphics graphics = new TXTTreemapGraphics(layout.getWidth(), layout.getHeight());
-		renderer.render(graphics, layout);
+	public void write(Treemap treemap, OutputStream output) throws IOException {
+		TXTTreemapGraphics graphics = new TXTTreemapGraphics(treemap.getWidth(), treemap.getHeight());
+		renderer.render(graphics, treemap);
 		graphics.append(new OutputStreamWriter(output, charset), lineSeparator);
 		graphics.dispose();
 	}

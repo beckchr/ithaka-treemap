@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Squarified treemap layouter.
+ * Squarified treemap builder.
  * This class is not thread-safe. 
  */
 public class SquarifiedTreemapBuilder implements TreemapBuilder {
@@ -30,7 +30,7 @@ public class SquarifiedTreemapBuilder implements TreemapBuilder {
 	private final int minContentFrameRatio;
 
 	private TreemapContentProvider content;
-	private Map<Object, TreemapCell> map;
+	private Map<Object, TreemapCell> cells;
 	private boolean sort = false;
 
 	public SquarifiedTreemapBuilder() {
@@ -45,18 +45,19 @@ public class SquarifiedTreemapBuilder implements TreemapBuilder {
 	private Rectangle getFramed(Object node, Rectangle r) {
 		int f = getFrameThickness(r);
 		Rectangle result = new Rectangle(r.x + f, r.y + f, r.width - f - f, r.height - f - f);
-		int totalArea = r.width * r.height;
-		int framedArea = result.width * result.height;
 		int childrenSize = 0;
 		for (Object child : content.getChildren(node)) {
 			childrenSize += content.getSize(child);
 		}
 		float childrenRatio = childrenSize / (float) content.getSize(node);
+		int totalArea = r.width * r.height;
+		int framedArea = result.width * result.height;
 		if (childrenRatio < framedArea / (float) totalArea) {	// choose a larger f so that (w-2f)(h-2f)/(wh) = childrenRatio
-			f = (int) ((r.width + r.height) / 4.0 - Math.sqrt((r.width + r.height) * (r.width + r.height) / 4.0 + r.width * r.height * (childrenRatio - 1)) / 2);
+			int s = r.width + r.height;
+			f = (int) (s / 4.0 - Math.sqrt(s * s / 4.0 + totalArea * (childrenRatio - 1)) / 2);
 			result = new Rectangle(r.x + f, r.y + f, r.width - f - f, r.height - f - f);
 		}
-		return result.width > 0 && result.height > 0 ? result : null;
+		return result.isEmpty() ? null : result;
 	}
 
 	private int getFrameThickness(Rectangle bounds) {
@@ -68,18 +69,15 @@ public class SquarifiedTreemapBuilder implements TreemapBuilder {
 	@Override
 	public Treemap build(TreemapContentProvider content, Object input, int width, int height) {
 		this.content = content;
-		this.map = new HashMap<Object, TreemapCell>();
+		this.cells = new HashMap<Object, TreemapCell>();
 		
 		Object[] elements = content.getElements(input);
-		Rectangle bounds = new Rectangle(width, height);
 		if (elements.length > 0) {
 			int border = content.getChildrenBorder(input, 0);
-			if (border > 0) {
-				bounds = new Rectangle(bounds.x + border, bounds.y + border, bounds.width - border, bounds.height - border);
-			}
+			Rectangle bounds = new Rectangle(border, border, width - border, height - border);
 			layout(elements, 0, elements.length - 1, bounds, true, true, border);
 		}
-		return new Treemap(map, elements, width, height);
+		return new Treemap(cells, elements, width, height);
 	}
 
 	private void layout(Object node, Rectangle bounds, boolean left, boolean top, int border) {
@@ -89,9 +87,9 @@ public class SquarifiedTreemapBuilder implements TreemapBuilder {
 			Arrays.sort(children, new Comparator<Object>() {
 				@Override
 				public int compare(Object o1, Object o2) {
-					int w1 = content.getSize(o1);
-					int w2 = content.getSize(o2);
-					return w1 < w2 ? 1 : w1 > w2 ? -1 : 0;
+					int s1 = content.getSize(o1);
+					int s2 = content.getSize(o2);
+					return s1 < s2 ? 1 : s1 > s2 ? -1 : 0;
 				}
 			});
 		}
@@ -99,7 +97,7 @@ public class SquarifiedTreemapBuilder implements TreemapBuilder {
 		if (cell.isEmpty()) {
 			return;
 		}
-		map.put(node, cell);
+		cells.put(node, cell);
 		if (children.length > 0) {
 			if (content.hasFrame(node)) {
 				bounds = getFramed(node, cell);
@@ -186,22 +184,26 @@ public class SquarifiedTreemapBuilder implements TreemapBuilder {
 			if (vertical) {
 				double exactHeight = bounds.height * content.getSize(nodes[i]) / size;
 				int height = (int) Math.round(exactHeight - delta);
-				layout(nodes[i], new Rectangle(bounds.x, bounds.y + offset, bounds.width, height), left, top && i == start, border);
+				Rectangle rect = new Rectangle(bounds.x, bounds.y + offset, bounds.width, height);
+				layout(nodes[i], rect, left, top && i == start, border);
 				offset += height;
 				delta += height - exactHeight;	// abs(dNew) = abs(dOld+h-e) = abs(h-(e-dOld)) <= 0.5 since h = round(e-dOld)
 			} else {
 				double exactWidth = bounds.width * content.getSize(nodes[i]) / size;
 				int width = (int) Math.round(exactWidth - delta);
-				layout(nodes[i], new Rectangle(bounds.x + offset, bounds.y, width, bounds.height), left && i == start, top, border);
+				Rectangle rect = new Rectangle(bounds.x + offset, bounds.y, width, bounds.height);
+				layout(nodes[i], rect, left && i == start, top, border);
 				offset += width;
 				delta += width - exactWidth;
 			}
 		}
 
 		if (vertical) {
-			layout(nodes[end], new Rectangle(bounds.x, bounds.y + offset, bounds.width, bounds.height - offset), left, top && start == end, border);
+			Rectangle rect = new Rectangle(bounds.x, bounds.y + offset, bounds.width, bounds.height - offset);
+			layout(nodes[end], rect, left, top && start == end, border);
 		} else {
-			layout(nodes[end], new Rectangle(bounds.x + offset, bounds.y, bounds.width - offset, bounds.height), left && start == end, top, border);
+			Rectangle rect = new Rectangle(bounds.x + offset, bounds.y, bounds.width - offset, bounds.height);
+			layout(nodes[end], rect, left && start == end, top, border);
 		}
 	}
 

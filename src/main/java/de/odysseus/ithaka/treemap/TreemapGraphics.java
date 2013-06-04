@@ -44,6 +44,7 @@ public interface TreemapGraphics {
 	 * @param x
 	 * @param y
 	 * @param color
+	 * @param vertical
 	 */
 	public void draw(String string, int x, int y, Color color, boolean vertical);
 
