@@ -28,6 +28,7 @@ public class TreemapRenderer {
 	}
 
 	public static enum TruncateLabelMode {
+		NoTruncate,
 		LeadingDots,
 		TrailingDots;
 	}
@@ -61,35 +62,35 @@ public class TreemapRenderer {
 	/**
 	 * Render all cells and labels.
 	 * @param graphics
-	 * @param layout
+	 * @param treemap
 	 */
-	public void render(TreemapGraphics graphics, Treemap layout) {
-		renderTree(graphics, layout);
+	public void render(TreemapGraphics graphics, Treemap treemap) {
+		renderTree(graphics, treemap);
 		if (labelProvider != null) {
-			renderLabels(graphics, layout);
+			renderLabels(graphics, treemap);
 		}
 	}
 
 	/**
 	 * Render all cells.
 	 * @param graphics
-	 * @param layout
+	 * @param treemap
 	 */
-	public void renderTree(TreemapGraphics graphics, Treemap layout) {
-		for (Object item : layout.getElements()) {
-			renderTree(graphics, layout, item, false);
+	public void renderTree(TreemapGraphics graphics, Treemap treemap) {
+		for (Object item : treemap.getElements()) {
+			renderTree(graphics, treemap, item, false);
 		}
 	}
 
 	/**
 	 * Render cells, starting at specified item.
 	 * @param graphics
-	 * @param layout
+	 * @param treemap
 	 * @param item
 	 * @param active
 	 */
-	public void renderTree(TreemapGraphics graphics, Treemap layout, Object item, boolean active) {
-		TreemapCell cell = layout.getCell(item);
+	public void renderTree(TreemapGraphics graphics, Treemap treemap, Object item, boolean active) {
+		TreemapCell cell = treemap.getCell(item);
 		if (cell == null) {
 			return;
 		}
@@ -117,7 +118,7 @@ public class TreemapRenderer {
 				graphics.fill(framed, colorProvider.getBorderColor(item, value));
 			}
 			for (Object node : cell.getChildren()) {
-				renderTree(graphics, layout, node, false);
+				renderTree(graphics, treemap, node, false);
 			}
 		}
 	}
@@ -125,21 +126,21 @@ public class TreemapRenderer {
 	/**
 	 * Render all labels.
 	 * @param graphics
-	 * @param layout
+	 * @param treemap
 	 * @param input
 	 */
-	public void renderLabels(TreemapGraphics graphics, Treemap layout) {
-		Object[] elements = layout.getElements();
-		for (Object node : elements) {
-			renderLabels(graphics, layout, node, elements.length > 1, labelLevels);
+	public void renderLabels(TreemapGraphics graphics, Treemap treemap) {
+		Object[] elements = treemap.getElements();
+		for (Object element : elements) {
+			renderLabels(graphics, treemap, element, elements.length > 1, labelLevels);
 		}
 	}
 
-	private void renderLabels(TreemapGraphics graphics, Treemap layout, Object item, boolean forked, int levels) {
+	private void renderLabels(TreemapGraphics graphics, Treemap treemap, Object item, boolean forked, int levels) {
 		if (levels == 0) {
 			return;
 		}
-		TreemapCell cell = layout.getCell(item);
+		TreemapCell cell = treemap.getCell(item);
 		if (cell == null) {
 			return;
 		}
@@ -156,17 +157,17 @@ public class TreemapRenderer {
 		}
 		if (attachLabel) {
 			if (renderLabel(graphics, cell, item) && cell.getFramed() != null) {
-				renderChildrenLabels(graphics, layout, cell.getChildren(), levels - 1);
+				renderChildrenLabels(graphics, treemap, cell.getChildren(), levels - 1);
 			}
 		} else if (attachLabelMode != AttachLabelMode.TopLevelsOnly) {
-			renderChildrenLabels(graphics, layout, cell.getChildren(), levels - 1);
+			renderChildrenLabels(graphics, treemap, cell.getChildren(), levels - 1);
 		}
 	}
 
-	private void renderChildrenLabels(TreemapGraphics graphics, Treemap layout, Object[] children, int levels) {
+	private void renderChildrenLabels(TreemapGraphics graphics, Treemap treemap, Object[] children, int levels) {
 		boolean forked = children.length > 1;
 		for (Object child : children) {
-			renderLabels(graphics, layout, child, forked, levels);
+			renderLabels(graphics, treemap, child, forked, levels);
 		}
 	}
 
@@ -178,6 +179,8 @@ public class TreemapRenderer {
 				return DOTS + label.substring(label.length() - fittingCharacters);
 			case TrailingDots:
 				return label.substring(0, fittingCharacters) + DOTS;
+			default:
+				return null;
 			}
 		}
 		return null;
@@ -197,7 +200,7 @@ public class TreemapRenderer {
 		} else if (dimension.width <= cell.height - labelSpaceLR && dimension.height <= width - labelSpaceTB) {	// string fits vertically
 			anchor = new Point((width - dimension.height) / 2, (cell.height + dimension.width) / 2);
 			vertical = true;
-		} else if (truncateLabelMode != null) { // string doesn't fit, try to truncate...
+		} else if (truncateLabelMode != TruncateLabelMode.NoTruncate) { // string doesn't fit, try to truncate...
 			String hLabel = null;
 			if (dimension.height <= height - labelSpaceTB) {
 				hLabel = truncateLabel(label, cell.width - labelSpaceLR, dimension.width, 3);
