@@ -25,7 +25,7 @@
 	<scm>
 		<connection>scm:git:https://github.com/beckchr/ithaka-treemap.git</connection>
 		<developerConnection>scm:git:git@github.com:beckchr/ithaka-treemap.git</developerConnection>
-		<url>https://github.com/beckchr/ithaka-digraph</url>
+		<url>https://github.com/beckchr/ithaka-treemap</url>
 	</scm>
 
 	<properties>
