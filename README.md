@@ -39,13 +39,13 @@ available when rendering the layout to determine labels and colors.
 ### TreemapBuilder Interface
 
 The content provider is all needed to perform a layout.
-A `TreemapBulder` is used to create a treemap (i.e. the layout).
+A `TreemapBuilder` is used to create a treemap (i.e. the layout).
 
 	Treemap build(TreemapContentProvider content, Object input, int width, int height);
 
 ### SquarifiedTreemapBuilder Class
 
-The `SquarifiedTreemapBuilder` class implements `TreemapBulder`, taking care about keeping the
+The `SquarifiedTreemapBuilder` class implements `TreemapBuilder`, taking care about keeping the
 aspect ratio of cells in the layout close to one.
 
 ### TreemapLabelProvider Interface
