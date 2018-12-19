@@ -20,6 +20,7 @@ As a side note, the above image has been rendered from a layout computed by _Ith
 
 The `TreemapContentProvider` interface is used to describe the tree structure and layout properties.
 
+```java
 	Object[] getElements(Object input); // get root elements
 	Object[] getChildren(Object element); // get element children
 	boolean hasChildren(Object element); // leaf test
@@ -28,6 +29,7 @@ The `TreemapContentProvider` interface is used to describe the tree structure an
 	int getSize(Object element); // get size for element (cell size)
 	boolean hasFrame(Object element); // layout children with frame
 	int getChildrenBorder(Object element, int border); // border around children
+```
 
 An element is visible in the layout if it is a leaf (`hasChildren(element) == false`) or it has a
 frame (`hasFrame(element) == true`). Otherwise the element's cell in the layout will be totally
@@ -41,7 +43,9 @@ available when rendering the layout to determine labels and colors.
 The content provider is all needed to perform a layout.
 A `TreemapBuilder` is used to create a treemap (i.e. the layout).
 
+```java
 	Treemap build(TreemapContentProvider content, Object input, int width, int height);
+```
 
 ### SquarifiedTreemapBuilder Class
 
@@ -53,17 +57,21 @@ aspect ratio of cells in the layout close to one.
 When rendering a treemap, labels can be placed into cells. The `TreemapLabelProvider` provides
 the API to specify those:
 
+```java
 	String getText(Object element, Object value); // label to place inside a cell
 	String getTooltipText(Object element, Object value); // optional tooltip label
+```
 
 ### TreemapColorProvider Interface
 
+```java
 	Color getForegroundColor(Object element, Object value); // label color
 	Color getForegroundShadowColor(Object element, Object value); // optional label shadow color
 	Color getBackgroundColor(Object element, Object value); // primary cell color
 	Color getBackgroundGradientColor(Object element, Object value); // optional cell gradient color
 	Color getHighlightColor(Object element, Object value); // cell selection color
 	Color getBorderColor(Object element, Object value); // border color
+```
 
 ### TreemapGraphics Interface
 
@@ -75,14 +83,18 @@ no need to implement your own.
 
 Having a `TreemapLabelProvider` and `TreemapColorProvider`, a treemap can be rendered.
 
+```java
 	TreemapRenderer(TreemapLabelProvider labelProvider, TreemapColorProvider colorProvider);
 	void render(TreemapGraphics graphics, Treemap layout);
+```
 
 ### TreemapWriter Interface
 
 The `TreemapWriter` interface is a convenient image creation.
 
+```java
 	void write(Treemap layout, OutputStream output) throws IOException;
+```
 
 Again, there are implementations for AWT and SWT, taking a `TreemapRenderer`, image type and label
 font at construction time.
@@ -91,18 +103,22 @@ font at construction time.
 
 Add Maven repository
 
+```xml
 	<repository>
 		<id>ithaka</id>
 		<url>http://beckchr.github.com/ithaka-maven/mvnrepo/</url>
 	</repository>
+```
 
 as well as dependency
 
+```xml
 	<dependency>
 		<groupId>de.odysseus.ithaka</groupId>
 		<artifactId>ithaka-treemap</artifactId>
 		<version>1.0</version>
 	</dependency>
+```
 
 or manually grab latest JARs [here](http://beckchr.github.com/ithaka-maven/mvnrepo/de/odysseus/ithaka/ithaka-treemap/1.0). 
 
